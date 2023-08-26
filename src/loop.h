@@ -2,7 +2,6 @@
 // Copyright (C) 2023 defg43
 // https://github.com/defg43/
 
-
 #ifndef LOOP_H
 #define LOOP_H
 

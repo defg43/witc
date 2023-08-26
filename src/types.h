@@ -75,7 +75,7 @@
 #define _foreach_ladder62(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder63(F, a, __VA_ARGS__))
 #define _foreach_ladder63(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder64(F, a, __VA_ARGS__))
 #define _foreach_ladder64(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder65(F, a, __VA_ARGS__))
-#define _foreach_ladder65(F, a, n, ...) F(a, n) _Pragma("GCC error \"too many arguments\"");
+#define _foreach_ladder65(F, a, n, ...) F(a, n) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
 #define switch_expr(...) _foreach_ladder_entry(_switchex1, _, __VA_ARGS__) false _foreach_ladder_entry(_switchex2, _, __VA_ARGS__)
 #define _switchex1(_, x) __builtin_choose_expr(_switchex1b x
