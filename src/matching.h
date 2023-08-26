@@ -88,8 +88,6 @@ typedef nullptr_t _matcher_hidden_wildcard_type;
     _local_matching_object = {__VA_ARGS__}; ({static int _match_iter = 0; \
     _match_iter ^= 1 ;_match_iter == 1;}); /*nothing*/)
 
-#define when_elements(...) \
-		_matchany_foreach(_match_defaulter,,__VA_ARGS__)
 
 #define pattern(...) else if(_create_comparisons(__VA_ARGS__))
 
