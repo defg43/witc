@@ -5,6 +5,7 @@
 #ifndef MATCH_H
 #define MATCH_H
 
+#include <stdbool.h>
 #include "types.h"
 
 #define _matchany_foreach(F, a,...) __VA_OPT__(_matchany_foreach_ladder0(F, a, __VA_ARGS__))
@@ -75,7 +76,7 @@
 #define _matchany_foreach_ladder64(F, a, n, ...) F(_64, n) __VA_OPT__(_matchany_foreach_ladder65(F, a, __VA_ARGS__))
 #define _matchany_foreach_ladder65(F, a, n, ...) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
-typedef nullptr_t _matcher_hidden_wildcard_type;
+typedef struct { int placeholder; } _matcher_hidden_wildcard_type;
 
 #define wildcard(expr) _matcher_hidden_wildcard_type expr = {0}; if(0) { }
 
@@ -84,12 +85,15 @@ typedef nullptr_t _matcher_hidden_wildcard_type;
 #define _matchany_generate_elements(...) \
 	_matchany_foreach(_match_struct_element_numbered,,__VA_ARGS__)
 	
-#define match(...) for( struct { _matchany_generate_elements(__VA_ARGS__) } \
-    _local_matching_object = {__VA_ARGS__}; ({static int _match_iter = 0; \
+#define match(...) for( struct { bool matched; \
+	_matchany_generate_elements(__VA_ARGS__) } \
+    _local_matching_object = { false,  __VA_ARGS__}; \
+    ({static int _match_iter = 0; \
     _match_iter ^= 1 ;_match_iter == 1;}); /*nothing*/)
 
 
-#define pattern(...) else if(_create_comparisons(__VA_ARGS__))
+#define pattern(...) if(_local_matching_object.matched = \
+	!_local_matching_object.matched && _create_comparisons(__VA_ARGS__))
 
 #define _comparison_or_defaulter(arg1, arg2) _Generic((arg2), \
 	_matcher_hidden_wildcard_type: true, \
