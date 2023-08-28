@@ -97,15 +97,6 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 	}) )\
 	_Pragma("GCC diagnostic push")
 
-#define _comparison_or_defaulter_old(arg1, arg2) \
-	_Generic((arg2), \
-		_matcher_hidden_wildcard_type: true, \
-		default: compare(_local_matching_object.arg1, \
-		(__builtin_types_compatible_p(typeof(arg2), \
-		typeof(_local_matching_object.arg1))) \
-		? arg2 : _local_matching_object.arg1) \
-	)
-
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
