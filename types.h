@@ -9,6 +9,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef __cplusplus
+#include <type_traits>
+#endif
+
 #define _foreach_ladder_entry(F, a, ...) _foreach_ladder0(F, a, __VA_ARGS__)
 #define _foreach_ladder0(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder1(F, a, __VA_ARGS__))
 #define _foreach_ladder1(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder2(F, a, __VA_ARGS__))
@@ -77,21 +81,35 @@
 #define _foreach_ladder64(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder65(F, a, __VA_ARGS__))
 #define _foreach_ladder65(F, a, n, ...) F(a, n) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
+#ifndef __cplusplus
 #define switch_expr(...) _foreach_ladder_entry(_switchex1, _, __VA_ARGS__) false _foreach_ladder_entry(_switchex2, _, __VA_ARGS__)
 #define _switchex1(_, x) __builtin_choose_expr(_switchex1b x
 #define _switchex1b(a, b) a, b,
 #define _switchex2(_, x) )
+#endif // __cplusplus
 
 #define default_expr 1
  
 // soon tm
 typedef union trait {
 	uint64_t data;
-	struct{
+	struct {
 		// flags here
 	};
 } trait_t;
 
+#ifdef __cplusplus		
+	template <typename T>
+	    bool compare(T a, T b) {
+	        if constexpr(std::is_same<T, char *>() || std::is_same<T, const char *>())
+	            return strcmp((char *)a, (char *)b) == 0;
+	        else if constexpr(__builtin_classify_type(a) == 12 || __builtin_classify_type(a) == 13 
+	        		|| std::is_array<T>::value)
+	            return memcmp((const void *)&a, (const void *)&b, sizeof(T)) == 0;
+	        else 
+	            return a == b;
+	    } 
+#else
 bool _compare_u8 (uint8_t a, uint8_t b, size_t size) {
 	(void) size;
 	return a == b;
@@ -145,6 +163,9 @@ bool _compare_raw_pointer(void *a, void *b, size_t size) {
 	(void) size;
 	return a == b;
 }
+#endif // __cplusplus
+
+#ifndef __cplusplus
 
 #if 0
 #define is_same_type(a, b)  __builtin_types_compatible_p(typeof(a), typeof(b))
@@ -249,4 +270,6 @@ switch_expr(\
 #define compare(a, b)\
 _select_compare(a)(_adjust_compare_arg(a), \
 	_adjust_compare_arg(b), min_size(a, b))
+
+#endif // not __cplusplus
 #endif /* TYPES_H */
