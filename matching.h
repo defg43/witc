@@ -88,6 +88,16 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
     _local_matching_object = {__VA_ARGS__}; \
     _.iterator == false; _.iterator = true)
 
+#ifdef __cplusplus
+
+#define pattern(...) \
+	if( ({ if(_.matched == true) break; \
+	_.matched = (_create_comparisons(__VA_ARGS__)); \
+	_.matched; \
+	}) )
+	
+#else
+
 #define pattern(...) \
 	_Pragma("GCC diagnostic push") \
 	_Pragma("GCC diagnostic ignored \"-Wint-conversion\"") \
@@ -97,12 +107,31 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 	}) )\
 	_Pragma("GCC diagnostic push")
 
+#endif
+
+#ifdef __cplusplus
+
+#define _comparison_or_defaulter(arg1, arg2) _comparison_or_defaulter_func(_local_matching_object.arg1, arg2)
+template <typename T, typename U>
+bool _comparison_or_defaulter_func(T arg1, U arg2) {
+    if constexpr (std::is_same<U, _matcher_hidden_wildcard_type>()) {
+        return true;
+    } else {
+        return compare(arg1, arg2);
+    }
+}
+
+#else
+
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
 		default: \
 		compare(_local_matching_object.arg1, arg2) \
-	)	
+	)
+		
+#endif
+
 
 #define _create_comparisons(...) \
 	true _matchany_foreach(&& \
