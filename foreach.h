@@ -15,10 +15,17 @@
 
 #define lengthof(x) ((sizeof(x)/sizeof(0[x])) /\
 	((size_t)(!(sizeof(x) % sizeof(0[x])))))
+
+#ifdef __cplusplus
+#include <type_traits>
+#define assert_array(a, msg) static_assert(std::is_array_v<typeof(a)>, msg)
+#define assert_not_array(a, msg) static_assert(!std::is_array_v<typeof(a)>, msg)	
+#else
 #define assert_array(a, msg) \
     static_assert(1 - __builtin_types_compatible_p(typeof(a), typeof(&(a)[0])), msg)
 #define assert_not_array(a, msg) \
 	static_assert(__builtin_types_compatible_p(typeof(a), typeof(&(a)[0])), msg)
+#endif // __cplusplus
 
 #define _foreach_err _Pragma("GCC error \"too many or wrong order of arguments\"");
 
