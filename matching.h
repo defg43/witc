@@ -77,6 +77,9 @@
 #define _matchany_foreach_ladder65(F, a, n, ...) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
 typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
+typedef union { int content; } _matcher_hidden_lessthan_type;
+typedef union { int content; } _matcher_hidden_greaterthan_type;
+typedef union { int content; } _matcher_hidden_unequal_type;
 
 #define _match_struct_element_numbered(mod, prop) typeof(prop) mod;
 
@@ -105,8 +108,7 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 	_.matched = (_create_comparisons(__VA_ARGS__)); \
 	_.matched; \
 	}) )\
-	_Pragma("GCC diagnostic push")
-
+	_Pragma("GCC diagnostic pop")
 #endif
 
 #ifdef __cplusplus
@@ -123,15 +125,26 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 
 #else
 
+#define _matcher_coerce_type(arg, type) (*(type *)({__auto_type _x = arg; &_x;}))
+
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
+		_matcher_hidden_lessthan_type: \
+		_local_matching_object.arg1 < \
+		_matcher_coerce_type(arg2, _matcher_hidden_lessthan_type).content, \
+		_matcher_hidden_greaterthan_type: \
+		_local_matching_object.arg1 > \
+		_matcher_coerce_type(arg2, _matcher_hidden_greaterthan_type).content, \
 		default: \
-		compare(_local_matching_object.arg1, arg2) \
+		compare(_local_matching_object.arg1, \
+		_matcher_coerce_type(arg2, typeof(_local_matching_object.arg1))) \
 	)
 		
 #endif
 
+#define lessthan(num) (_matcher_hidden_lessthan_type) { num }
+#define greaterthan(num) (_matcher_hidden_greaterthan_type) { num }
 
 #define _create_comparisons(...) \
 	true _matchany_foreach(&& \
