@@ -86,24 +86,126 @@
 #define _switchex1(_, x) __builtin_choose_expr(_switchex1b x
 #define _switchex1b(a, b) a, b,
 #define _switchex2(_, x) )
-#endif // __cplusplus
-
 #define default_expr 1
+#endif // __cplusplus
  
-// soon tm
 typedef union trait {
 	uint64_t data;
 	struct {
-		// flags here
+		bool is_integral:1;
+		uint16_t integral_type:4;
+		int16_t _builtin_type_classifcation:5;
+		bool is_string:1;
+		bool is_enum:1;
+		bool is_vector:1;
+		
+		bool is_function:1;
+		bool is_method:1;
+		
+		bool is_struct:1;
+		bool is_union:1;
+		bool is_tagged_union:1;
+
+		bool is_array:1;
+		bool is_pointer:1;
+		uint16_t level_of_indirection:16;
 	};
 } trait_t;
+
+#define type_name(expr) \
+    (_Generic((expr), \
+              char: "char", unsigned char: "unsigned char", signed char: "signed char", \
+              short: "short", unsigned short: "unsigned short", \
+              int: "int", unsigned int: "unsigned int", \
+              long: "long", unsigned long: "unsigned long", \
+              long long: "long long", unsigned long long: "unsigned long long", \
+              float: "float", \
+              double: "double", \
+              long double: "long double", \
+              void *: "void *", \
+              default: "unkown type")) 
+
+#define _all_integral_types \
+char , signed char , unsigned char, \
+short, signed short int, unsigned short, \
+int, signed int, unsigned int, \
+long, signed long, unsigned long, \
+signed long long, unsigned long long 
+
+// probably deprecated
+enum all_integrals {
+	_char = 1, 
+	_int8_t = 2, 
+	_uint8_t = 3,  
+	_int16_t = 4, 
+	_uint16_t = 5, 
+	_int32_t = 6, 
+	_uint32_t = 7, 
+	_int64_t = 8, 
+	_uint64_t = 9, 
+	_float = 10, 
+	_double = 11, 
+	_long_double = 12
+};
+
+// probably deprecated
+#define _get_integral_type(num) _Generic((num),\
+	char: _char, \
+	int8_t: _int8_t, \
+	uint8_t: _int8_t, \
+	int16_t: _int16_t, \
+	uint16_t: _uint16_t, \
+	int32_t: _int32_t, \
+	uint32_t: _uint32_t, \
+	int64_t: _int64_t, \
+	uint64_t: _uint64_t, \
+	float: _float, \
+	double: _double, \
+	long double: _long_double, \
+	default: 0 \
+)
+
+#define coerce_type(type, arg) ({typeof(arg) _x = arg; *((type *)&_x);})
+
+// probably deprecated
+#define _coerce_into_integral_type(type_num, var) \
+	(type_num == 1) ? coerce_type(char, var) : \
+	(type_num == 2) ? coerce_type(int8_t, var) : \
+	(type_num == 3) ? coerce_type(uint8_t, var) : \
+	(type_num == 4) ? coerce_type(int16_t, var) : \
+	(type_num == 5) ? coerce_type(uint16_t, var) : \
+	(type_num == 6) ? coerce_type(int32_t, var) : \
+	(type_num == 7) ? coerce_type(uint32_t, var) : \
+	(type_num == 8) ? coerce_type(int64_t, var) : \
+	(type_num == 9) ? coerce_type(uint64_t, var) : \
+	(type_num == 10) ? coerce_type(float, var) : \
+	(type_num == 11) ? coerce_type(double, var) : \
+	(type_num == 12) ? coerce_type(long double, var) : \
+	var
+
+#define _get_traits(var) \
+(trait_t){ .is_integral = _get_integral_type(var) > 0, \
+.integral_type = _get_integral_type(var), \
+._builtin_type_classifcation = __builtin_classify_type(var), \
+.is_string = is_string(var), \
+.is_enum = is_enum(var), \
+.is_vector = is_vector(var), \
+.is_function = is_function(var), \
+.is_method = is_method(var), \
+.is_struct = is_struct(var), \
+.is_union = is_union(var), \
+.is_tagged_union = false, \
+.is_array = is_array(var), \
+.is_pointer = is_pointer(var) \
+}
 
 #ifdef __cplusplus		
 	template <typename T>
 	    bool compare(T a, T b) {
 	        if constexpr(std::is_same<T, char *>() || std::is_same<T, const char *>())
 	            return strcmp((char *)a, (char *)b) == 0;
-	        else if constexpr(__builtin_classify_type(a) == 12 || __builtin_classify_type(a) == 13 
+	        else if constexpr(__builtin_classify_type(a) == 12 || 
+	        		__builtin_classify_type(a) == 13 
 	        		|| std::is_array<T>::value)
 	            return memcmp((const void *)&a, (const void *)&b, sizeof(T)) == 0;
 	        else 
@@ -184,6 +286,8 @@ bool _compare_raw_pointer(void *a, void *b, size_t size) {
 #define is_pointer(p) is_same_type(p, decay(p))
 #define is_array(p) (is_pointer_or_array(p) && !is_pointer(p))
 #endif
+
+#define is_signed(num) ({typeof(num) _x = -1; _x < 0;})
 
 // for getting the type classes
 #define is_vector(p) (__builtin_classify_type(p) == -2)
