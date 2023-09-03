@@ -318,7 +318,7 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	long double: (_matcher_hidden_greaterthan_type_double) { num } \
 )) 
 
-#define unequal(num)  (_Generic((num), \
+#define notequal(num)  (_Generic((num), \
 	char: (_matcher_hidden_unequal_type_char) { num }, \
 	int8_t: (_matcher_hidden_unequal_type_int8_t) { num }, \
 	int16_t: (_matcher_hidden_unequal_type_int16_t) { num }, \
