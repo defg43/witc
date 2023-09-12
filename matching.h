@@ -76,48 +76,27 @@
 #define _matchany_foreach_ladder64(F, a, n, ...) F(_64, n) __VA_OPT__(_matchany_foreach_ladder65(F, a, __VA_ARGS__))
 #define _matchany_foreach_ladder65(F, a, n, ...) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
+typedef long double long_double;
+typedef struct { int _x; } \
+	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error;
+
 typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 
-// lessthan
-typedef struct { char content; } _matcher_hidden_lessthan_type_char;
-typedef struct { int8_t content; } _matcher_hidden_lessthan_type_int8_t;
-typedef struct { int16_t content; } _matcher_hidden_lessthan_type_int16_t;
-typedef struct { int32_t content; } _matcher_hidden_lessthan_type_int32_t;
-typedef struct { int64_t content; } _matcher_hidden_lessthan_type_int64_t;
-typedef struct { uint8_t content; } _matcher_hidden_lessthan_type_uint8_t;
-typedef struct { uint16_t content; } _matcher_hidden_lessthan_type_uint16_t;
-typedef struct { uint32_t content; } _matcher_hidden_lessthan_type_uint32_t;
-typedef struct { uint64_t content; } _matcher_hidden_lessthan_type_uint64_t;
-typedef struct { float content; } _matcher_hidden_lessthan_type_float;
-typedef struct { double content; } _matcher_hidden_lessthan_type_double;
-typedef struct { long double content; } _matcher_hidden_lessthan_type_long_double;
-// greaterthan
-typedef struct { char content; } _matcher_hidden_greaterthan_type_char;
-typedef struct { int8_t content; } _matcher_hidden_greaterthan_type_int8_t;
-typedef struct { int16_t content; } _matcher_hidden_greaterthan_type_int16_t;
-typedef struct { int32_t content; } _matcher_hidden_greaterthan_type_int32_t;
-typedef struct { int64_t content; } _matcher_hidden_greaterthan_type_int64_t;
-typedef struct { uint8_t content; } _matcher_hidden_greaterthan_type_uint8_t;
-typedef struct { uint16_t content; } _matcher_hidden_greaterthan_type_uint16_t;
-typedef struct { uint32_t content; } _matcher_hidden_greaterthan_type_uint32_t;
-typedef struct { uint64_t content; } _matcher_hidden_greaterthan_type_uint64_t;
-typedef struct { float content; } _matcher_hidden_greaterthan_type_float;
-typedef struct { double content; } _matcher_hidden_greaterthan_type_double;
-typedef struct { long double content; } _matcher_hidden_greaterthan_type_long_double;
+#define _matcher_relational_types \
+	char, \
+	int8_t, int16_t, int32_t, int64_t, \
+	uint8_t, uint16_t, uint32_t, uint64_t, \
+	float, double, long_double
+	
+#define _matcher_generate_typdef(sort, type) \
+	typedef struct { type content; } _matcher_hidden_##sort##_type_##type;
 
-// unequal
-typedef struct { char content; } _matcher_hidden_unequal_type_char;
-typedef struct { int8_t content; } _matcher_hidden_unequal_type_int8_t;
-typedef struct { int16_t content; } _matcher_hidden_unequal_type_int16_t;
-typedef struct { int32_t content; } _matcher_hidden_unequal_type_int32_t;
-typedef struct { int64_t content; } _matcher_hidden_unequal_type_int64_t;
-typedef struct { uint8_t content; } _matcher_hidden_unequal_type_uint8_t;
-typedef struct { uint16_t content; } _matcher_hidden_unequal_type_uint16_t;
-typedef struct { uint32_t content; } _matcher_hidden_unequal_type_uint32_t;
-typedef struct { uint64_t content; } _matcher_hidden_unequal_type_uint64_t;
-typedef struct { float content; } _matcher_hidden_unequal_type_float;
-typedef struct { double content; } _matcher_hidden_unequal_type_double;
-typedef struct { long double content; } _matcher_hidden_unequal_type_long_double;
+#define _matcher_generate_typedefs_for_types(sort, types) \
+	_foreach_ladder_entry(_matcher_generate_typdef, sort, types)
+
+_matcher_generate_typedefs_for_types(lessthan, _matcher_relational_types)
+_matcher_generate_typedefs_for_types(greaterthan, _matcher_relational_types)
+_matcher_generate_typedefs_for_types(unequal, _matcher_relational_types)
 
 #define _match_struct_element_numbered(mod, prop) typeof(prop) mod;
 
@@ -163,124 +142,50 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 
 #else
 
-#define _matcher_c // i have no idea what i wanted to say here
+// this should probably be moved to a seperate file
+#define MACRO_TUPEL_FIRST(a, b) a
+#define MACRO_TUPEL_SECOND(a, b) b
+
+#define _matcher_generate_lessthan_comparison(macro_tupel_arg, type) \
+	_matcher_hidden_lessthan_type_##type: ({ __auto_type _x = \
+	coerce_type(_matcher_hidden_lessthan_type_##type, \
+	MACRO_TUPEL_SECOND macro_tupel_arg); \
+	_x.content > MACRO_TUPEL_FIRST macro_tupel_arg;}),
+			
+#define _matcher_generate_greaterthan_comparison(macro_tupel_arg, type) \
+	_matcher_hidden_greaterthan_type_##type: ({ __auto_type _x = \
+	coerce_type(_matcher_hidden_greaterthan_type_##type, \
+	MACRO_TUPEL_SECOND macro_tupel_arg); \
+	_x.content < MACRO_TUPEL_FIRST macro_tupel_arg;}), 
+
+#define _matcher_generate_unequal_comparison(macro_tupel_arg, type) \
+	_matcher_hidden_unequal_type_##type: ({ __auto_type _x = \
+	coerce_type(_matcher_hidden_unequal_type_##type, \
+	MACRO_TUPEL_SECOND macro_tupel_arg); \
+	_x.content != MACRO_TUPEL_FIRST macro_tupel_arg;}),
+
+#define _matcher_generate_comparison_impl(comparsion, argum1, argum2, types) \
+	_foreach_ladder_entry(comparsion, (argum1, argum2), types)
 
 #define _matcher_coerce_type(arg, type) (coerce_type(type, arg))
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
 		/*lessthan*/\
-		_matcher_hidden_lessthan_type_char: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_char, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_int8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int8_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_int16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int16_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_int32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int32_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_int64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int64_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_uint8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int8_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_uint16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int16_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_uint32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int32_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_uint64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_int64_t, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_float: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_float, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_double, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
-		_matcher_hidden_lessthan_type_long_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_lessthan_type_long_double, arg2); \
-			_x.content > _local_matching_object.arg1;}), \
+		_matcher_generate_comparison_impl( \
+			_matcher_generate_lessthan_comparison, \
+			_local_matching_object.arg1, arg2, \
+			_matcher_relational_types) \
 		/*greaterthan*/\
-		_matcher_hidden_greaterthan_type_char: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_char, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_int8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int8_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_int16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int16_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_int32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int32_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_int64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int64_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_uint8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int8_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_uint16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int16_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_uint32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int32_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_uint64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_int64_t, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_float: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_float, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_double, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
-		_matcher_hidden_greaterthan_type_long_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_greaterthan_type_long_double, arg2); \
-			_x.content < _local_matching_object.arg1;}), \
+		_matcher_generate_comparison_impl( \
+			_matcher_generate_greaterthan_comparison, \
+			_local_matching_object.arg1, arg2, \
+			_matcher_relational_types) \
 		/*unequal*/\
-		_matcher_hidden_unequal_type_char: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_char, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_int8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int8_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_int16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int16_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_int32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int32_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_int64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int64_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_uint8_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int8_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_uint16_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int16_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_uint32_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int32_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_uint64_t: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_int64_t, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_float: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_float, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_double, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		_matcher_hidden_unequal_type_long_double: ({ __auto_type _x = \
-			coerce_type(_matcher_hidden_unequal_type_long_double, arg2); \
-			_x.content != _local_matching_object.arg1;}), \
-		\
+		_matcher_generate_comparison_impl( \
+			_matcher_generate_unequal_comparison, \
+			_local_matching_object.arg1, arg2, \
+			_matcher_relational_types) \
 		default: \
 		compare(_local_matching_object.arg1, \
 		coerce_type(typeof(_local_matching_object.arg1), arg2)) \
@@ -288,54 +193,39 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 		
 #endif
 
+#define _matcher_generate_lessthan_expr(num, type) \
+	type: (_matcher_hidden_lessthan_type_##type) { num }, \
+
+#define _matcher_generate_greaterthan_expr(num, type) \
+	type: (_matcher_hidden_greaterthan_type_##type) { num }, \
+
+#define _matcher_generate_unequal_expr(num, type) \
+	type: (_matcher_hidden_unequal_type_##type) { num }, \
+
+#define _matcher_generate_expr_impl(sort, num, types) \
+	_foreach_ladder_entry(sort, num, types)	
+
 #define lessthan(num)  (_Generic((num), \
-	char: (_matcher_hidden_lessthan_type_char) { num }, \
-	int8_t: (_matcher_hidden_lessthan_type_int8_t) { num }, \
-	int16_t: (_matcher_hidden_lessthan_type_int16_t) { num }, \
-	int32_t: (_matcher_hidden_lessthan_type_int32_t) { num }, \
-	int64_t: (_matcher_hidden_lessthan_type_int64_t) { num }, \
-	uint8_t: (_matcher_hidden_lessthan_type_uint8_t) { num }, \
-	uint16_t: (_matcher_hidden_lessthan_type_uint16_t) { num }, \
-	uint32_t: (_matcher_hidden_lessthan_type_uint32_t) { num }, \
-	uint64_t: (_matcher_hidden_lessthan_type_uint64_t) { num }, \
-	float: (_matcher_hidden_lessthan_type_float) { num }, \
-	double: (_matcher_hidden_lessthan_type_double) { num } , \
-	long double: (_matcher_hidden_lessthan_type_double) { num } \
+	_matcher_generate_expr_impl(_matcher_generate_lessthan_expr, num, \
+	_matcher_relational_types) \
+	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 ))
 
 #define greaterthan(num)  (_Generic((num), \
-	char: (_matcher_hidden_greaterthan_type_char) { num }, \
-	int8_t: (_matcher_hidden_greaterthan_type_int8_t) { num }, \
-	int16_t: (_matcher_hidden_greaterthan_type_int16_t) { num }, \
-	int32_t: (_matcher_hidden_greaterthan_type_int32_t) { num }, \
-	int64_t: (_matcher_hidden_greaterthan_type_int64_t) { num }, \
-	uint8_t: (_matcher_hidden_greaterthan_type_uint8_t) { num }, \
-	uint16_t: (_matcher_hidden_greaterthan_type_uint16_t) { num }, \
-	uint32_t: (_matcher_hidden_greaterthan_type_uint32_t) { num }, \
-	uint64_t: (_matcher_hidden_greaterthan_type_uint64_t) { num }, \
-	float: (_matcher_hidden_greaterthan_type_float) { num }, \
-	double: (_matcher_hidden_greaterthan_type_double) { num }, \
-	long double: (_matcher_hidden_greaterthan_type_double) { num } \
+		_matcher_generate_expr_impl(_matcher_generate_greaterthan_expr, num, \
+	_matcher_relational_types) \
+	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 )) 
 
 #define notequal(num)  (_Generic((num), \
-	char: (_matcher_hidden_unequal_type_char) { num }, \
-	int8_t: (_matcher_hidden_unequal_type_int8_t) { num }, \
-	int16_t: (_matcher_hidden_unequal_type_int16_t) { num }, \
-	int32_t: (_matcher_hidden_unequal_type_int32_t) { num }, \
-	int64_t: (_matcher_hidden_unequal_type_int64_t) { num }, \
-	uint8_t: (_matcher_hidden_unequal_type_uint8_t) { num }, \
-	uint16_t: (_matcher_hidden_unequal_type_uint16_t) { num }, \
-	uint32_t: (_matcher_hidden_unequal_type_uint32_t) { num }, \
-	uint64_t: (_matcher_hidden_unequal_type_uint64_t) { num }, \
-	float: (_matcher_hidden_unequal_type_float) { num }, \
-	double: (_matcher_hidden_unequal_type_double) { num }, \
-	long double: (_matcher_hidden_unequal_type_double) { num } \
+	_matcher_generate_expr_impl(_matcher_generate_unequal_expr, num, \
+	_matcher_relational_types) \
+	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 ))
 
 #define _create_comparisons(...) \
 	true _matchany_foreach(&& \
-	_comparison_or_defaulter,,__VA_ARGS__)	
+	_comparison_or_defaulter,,__VA_ARGS__)
 	
 #define when ) && (
 
