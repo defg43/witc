@@ -82,6 +82,7 @@ typedef struct { int _x; } \
 
 typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 
+// implementing pointers here would probably make sense too
 #define _matcher_relational_types \
 	char, \
 	int8_t, int16_t, int32_t, int64_t, \
@@ -91,12 +92,19 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 #define _matcher_generate_typdef(sort, type) \
 	typedef struct { type content; } _matcher_hidden_##sort##_type_##type;
 
+#define _matcher_generate_typdef_between(_,type) \
+	typedef struct { type start; type end; } _matcher_hidden_between_type_##type;
+
+#define _matcher_generate_typedef_for_between(types...) \
+	_foreach_ladder_entry(_matcher_generate_typdef_between,, types		)
+
 #define _matcher_generate_typedefs_for_types(sort, types) \
 	_foreach_ladder_entry(_matcher_generate_typdef, sort, types)
 
 _matcher_generate_typedefs_for_types(lessthan, _matcher_relational_types)
 _matcher_generate_typedefs_for_types(greaterthan, _matcher_relational_types)
 _matcher_generate_typedefs_for_types(unequal, _matcher_relational_types)
+_matcher_generate_typedef_for_between(_matcher_relational_types)
 
 #define _match_struct_element_numbered(mod, prop) typeof(prop) mod;
 
@@ -120,6 +128,7 @@ _matcher_generate_typedefs_for_types(unequal, _matcher_relational_types)
 
 #define pattern(...) \
 	_Pragma("GCC diagnostic push") \
+	_Pragma("GCC diagnostic ignored \"-Wunused-value\"")\
 	_Pragma("GCC diagnostic ignored \"-Wint-conversion\"") \
 	if( ({ if(_.matched == true) break; \
 	_.matched = (_create_comparisons(__VA_ARGS__)); \
@@ -130,7 +139,8 @@ _matcher_generate_typedefs_for_types(unequal, _matcher_relational_types)
 
 #ifdef __cplusplus
 
-#define _comparison_or_defaulter(arg1, arg2) _comparison_or_defaulter_func(_local_matching_object.arg1, arg2)
+#define _comparison_or_defaulter(arg1, arg2) \
+_comparison_or_defaulter_func(_local_matching_object.arg1, arg2)
 template <typename T, typename U>
 bool _comparison_or_defaulter_func(T arg1, U arg2) {
     if constexpr (std::is_same<U, _matcher_hidden_wildcard_type>()) {
@@ -164,6 +174,13 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	MACRO_TUPEL_SECOND macro_tupel_arg); \
 	_x.content != MACRO_TUPEL_FIRST macro_tupel_arg;}),
 
+#define _matcher_generate_between_comparison(macro_tupel_arg, type) \
+	_matcher_hidden_between_type_##type: ({ __auto_type _x = \
+	coerce_type(_matcher_hidden_between_type_##type, \
+	MACRO_TUPEL_SECOND macro_tupel_arg); \
+	_x.start <= MACRO_TUPEL_FIRST macro_tupel_arg && \
+	MACRO_TUPEL_FIRST macro_tupel_arg <= _x.end;}),
+
 #define _matcher_generate_comparison_impl(comparsion, argum1, argum2, types) \
 	_foreach_ladder_entry(comparsion, (argum1, argum2), types)
 
@@ -194,13 +211,17 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 #endif
 
 #define _matcher_generate_lessthan_expr(num, type) \
-	type: (_matcher_hidden_lessthan_type_##type) { num }, \
+	type: (_matcher_hidden_lessthan_type_##type) { num }, 
 
 #define _matcher_generate_greaterthan_expr(num, type) \
-	type: (_matcher_hidden_greaterthan_type_##type) { num }, \
+	type: (_matcher_hidden_greaterthan_type_##type) { num },
 
 #define _matcher_generate_unequal_expr(num, type) \
-	type: (_matcher_hidden_unequal_type_##type) { num }, \
+	type: (_matcher_hidden_unequal_type_##type) { num },
+
+#define _matcher_generate_between_expr(num_tupel, type) \
+	type: (_matcher_hidden_unequal_type_##type) { \
+	MACRO_TUPEL_FIRST num_tupel, MACRO_TUPEL_SECOND num_tupel },
 
 #define _matcher_generate_expr_impl(sort, num, types) \
 	_foreach_ladder_entry(sort, num, types)	
@@ -212,7 +233,7 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 ))
 
 #define greaterthan(num)  (_Generic((num), \
-		_matcher_generate_expr_impl(_matcher_generate_greaterthan_expr, num, \
+	_matcher_generate_expr_impl(_matcher_generate_greaterthan_expr, num, \
 	_matcher_relational_types) \
 	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 )) 
@@ -222,6 +243,13 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	_matcher_relational_types) \
 	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 ))
+
+#define between(num1, num2) \
+	(_Generic((num1), \
+	_matcher_generate_expr_impl(_matcher_generate_unequal_expr, (num1, num2), \
+	_matcher_relational_types) \
+	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
+	))
 
 #define _create_comparisons(...) \
 	true _matchany_foreach(&& \
