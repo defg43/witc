@@ -29,6 +29,9 @@
 
 #define _foreach_err _Pragma("GCC error \"too many or wrong order of arguments\"");
 
+#define _foreach_from_function(result, execution, condition) \
+	for( struct { typeof(result) result_copy; size_t _iterator; } = { ._iterator = 0 };; }
+
 #define _foreach_index(index, arr) \
 assert_array(arr, "argument is not array, declare size with: <n> sized <pointer>");\
 for(index, _hidden_foreach_index_dont_use = 0, _hidden_foreach_toggler = 1; _hidden_foreach_index_dont_use < lengthof(arr); _hidden_foreach_index_dont_use) \
