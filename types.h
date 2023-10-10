@@ -5,6 +5,21 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+// php to generate the ladders
+/*<?php
+$iterations = 65;
+    for ($i = 0; $i < $iterations; $i++) {
+        echo "#define _foreach_ladder{$i}(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder" . ($i + 1) . "(F, a, __VA_ARGS__))\n";
+    }
+?>*/
+
+/*<?php
+$iterations = 65;
+    for ($i = 0; $i < $iterations; $i++) {
+        echo "#define _foreach2_ladder{$i}(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder" . ($i + 1) . "(F, a, __VA_ARGS__))\n";
+    }
+?>*/
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -81,6 +96,141 @@
 #define _foreach_ladder64(F, a, n, ...) F(a, n) __VA_OPT__(_foreach_ladder65(F, a, __VA_ARGS__))
 #define _foreach_ladder65(F, a, n, ...) F(a, n) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
 
+#define _foreach2_ladder_entry(F, a, ...) _foreach2_ladder0(F, a, __VA_ARGS__)
+#define _foreach2_ladder0(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder1(F, a, __VA_ARGS__))
+#define _foreach2_ladder1(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder2(F, a, __VA_ARGS__))
+#define _foreach2_ladder2(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder3(F, a, __VA_ARGS__))
+#define _foreach2_ladder3(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder4(F, a, __VA_ARGS__))
+#define _foreach2_ladder4(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder5(F, a, __VA_ARGS__))
+#define _foreach2_ladder5(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder6(F, a, __VA_ARGS__))
+#define _foreach2_ladder6(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder7(F, a, __VA_ARGS__))
+#define _foreach2_ladder7(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder8(F, a, __VA_ARGS__))
+#define _foreach2_ladder8(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder9(F, a, __VA_ARGS__))
+#define _foreach2_ladder9(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder10(F, a, __VA_ARGS__))
+#define _foreach2_ladder10(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder11(F, a, __VA_ARGS__))
+#define _foreach2_ladder11(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder12(F, a, __VA_ARGS__))
+#define _foreach2_ladder12(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder13(F, a, __VA_ARGS__))
+#define _foreach2_ladder13(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder14(F, a, __VA_ARGS__))
+#define _foreach2_ladder14(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder15(F, a, __VA_ARGS__))
+#define _foreach2_ladder15(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder16(F, a, __VA_ARGS__))
+#define _foreach2_ladder16(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder17(F, a, __VA_ARGS__))
+#define _foreach2_ladder17(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder18(F, a, __VA_ARGS__))
+#define _foreach2_ladder18(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder19(F, a, __VA_ARGS__))
+#define _foreach2_ladder19(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder20(F, a, __VA_ARGS__))
+#define _foreach2_ladder20(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder21(F, a, __VA_ARGS__))
+#define _foreach2_ladder21(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder22(F, a, __VA_ARGS__))
+#define _foreach2_ladder22(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder23(F, a, __VA_ARGS__))
+#define _foreach2_ladder23(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder24(F, a, __VA_ARGS__))
+#define _foreach2_ladder24(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder25(F, a, __VA_ARGS__))
+#define _foreach2_ladder25(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder26(F, a, __VA_ARGS__))
+#define _foreach2_ladder26(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder27(F, a, __VA_ARGS__))
+#define _foreach2_ladder27(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder28(F, a, __VA_ARGS__))
+#define _foreach2_ladder28(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder29(F, a, __VA_ARGS__))
+#define _foreach2_ladder29(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder30(F, a, __VA_ARGS__))
+#define _foreach2_ladder30(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder31(F, a, __VA_ARGS__))
+#define _foreach2_ladder31(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder32(F, a, __VA_ARGS__))
+#define _foreach2_ladder32(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder33(F, a, __VA_ARGS__))
+#define _foreach2_ladder33(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder34(F, a, __VA_ARGS__))
+#define _foreach2_ladder34(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder35(F, a, __VA_ARGS__))
+#define _foreach2_ladder35(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder36(F, a, __VA_ARGS__))
+#define _foreach2_ladder36(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder37(F, a, __VA_ARGS__))
+#define _foreach2_ladder37(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder38(F, a, __VA_ARGS__))
+#define _foreach2_ladder38(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder39(F, a, __VA_ARGS__))
+#define _foreach2_ladder39(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder40(F, a, __VA_ARGS__))
+#define _foreach2_ladder40(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder41(F, a, __VA_ARGS__))
+#define _foreach2_ladder41(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder42(F, a, __VA_ARGS__))
+#define _foreach2_ladder42(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder43(F, a, __VA_ARGS__))
+#define _foreach2_ladder43(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder44(F, a, __VA_ARGS__))
+#define _foreach2_ladder44(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder45(F, a, __VA_ARGS__))
+#define _foreach2_ladder45(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder46(F, a, __VA_ARGS__))
+#define _foreach2_ladder46(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder47(F, a, __VA_ARGS__))
+#define _foreach2_ladder47(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder48(F, a, __VA_ARGS__))
+#define _foreach2_ladder48(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder49(F, a, __VA_ARGS__))
+#define _foreach2_ladder49(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder50(F, a, __VA_ARGS__))
+#define _foreach2_ladder50(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder51(F, a, __VA_ARGS__))
+#define _foreach2_ladder51(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder52(F, a, __VA_ARGS__))
+#define _foreach2_ladder52(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder53(F, a, __VA_ARGS__))
+#define _foreach2_ladder53(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder54(F, a, __VA_ARGS__))
+#define _foreach2_ladder54(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder55(F, a, __VA_ARGS__))
+#define _foreach2_ladder55(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder56(F, a, __VA_ARGS__))
+#define _foreach2_ladder56(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder57(F, a, __VA_ARGS__))
+#define _foreach2_ladder57(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder58(F, a, __VA_ARGS__))
+#define _foreach2_ladder58(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder59(F, a, __VA_ARGS__))
+#define _foreach2_ladder59(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder60(F, a, __VA_ARGS__))
+#define _foreach2_ladder60(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder61(F, a, __VA_ARGS__))
+#define _foreach2_ladder61(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder62(F, a, __VA_ARGS__))
+#define _foreach2_ladder62(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder63(F, a, __VA_ARGS__))
+#define _foreach2_ladder63(F, a, n, ...) F(a, n) __VA_OPT__(_foreach2_ladder64(F, a, __VA_ARGS__))
+#define _foreach2_ladder64(F, a, n, ...) F(a, n) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
+
+#define _foreach_ladder_reverse(F, a, ...) _foreach_ladder_reverse0(F, a, __VA_ARGS__)
+#define _foreach_ladder_reverse0(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse1(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse1(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse2(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse2(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse3(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse3(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse4(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse4(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse5(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse5(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse6(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse6(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse7(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse7(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse8(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse8(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse9(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse9(F, a, n, ...)  __VA_OPT__(_foreach_ladder_reverse10(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse10(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse11(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse11(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse12(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse12(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse13(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse13(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse14(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse14(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse15(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse15(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse16(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse16(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse17(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse17(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse18(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse18(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse19(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse19(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse20(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse20(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse21(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse21(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse22(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse22(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse23(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse23(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse24(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse24(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse25(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse25(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse26(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse26(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse27(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse27(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse28(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse28(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse29(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse29(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse30(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse30(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse31(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse31(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse32(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse32(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse33(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse33(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse34(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse34(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse35(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse35(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse36(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse36(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse37(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse37(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse38(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse38(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse39(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse39(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse40(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse40(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse41(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse41(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse42(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse42(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse43(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse43(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse44(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse44(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse45(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse45(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse46(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse46(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse47(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse47(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse48(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse48(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse49(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse49(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse50(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse50(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse51(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse51(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse52(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse52(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse53(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse53(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse54(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse54(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse55(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse55(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse56(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse56(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse57(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse57(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse58(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse58(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse59(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse59(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse60(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse60(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse61(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse61(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse62(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse62(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse63(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse63(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse64(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse64(F, a, n, ...) __VA_OPT__(_foreach_ladder_reverse65(F, a, __VA_ARGS__)) F(a, n)
+#define _foreach_ladder_reverse65(F, a, n, ...) F(a, n) _Pragma("GCC error \"exceeded 64 arguments, add more\"");
+
 #ifndef __cplusplus
 #define switch_expr(...) _foreach_ladder_entry(_switchex1, _, __VA_ARGS__) false _foreach_ladder_entry(_switchex2, _, __VA_ARGS__)
 #define _switchex1(_, x) __builtin_choose_expr(_switchex1b x
@@ -114,16 +264,16 @@ typedef union trait {
 
 #define type_name(expr) \
     (_Generic((expr), \
-              char: "char", unsigned char: "unsigned char", signed char: "signed char", \
-              short: "short", unsigned short: "unsigned short", \
-              int: "int", unsigned int: "unsigned int", \
-              long: "long", unsigned long: "unsigned long", \
-              long long: "long long", unsigned long long: "unsigned long long", \
-              float: "float", \
-              double: "double", \
-              long double: "long double", \
-              void *: "void *", \
-              default: "unkown type")) 
+        char: "char", unsigned char: "unsigned char", signed char: "signed char", \
+        short: "short", unsigned short: "unsigned short", \
+        int: "int", unsigned int: "unsigned int", \
+        long: "long", unsigned long: "unsigned long", \
+        long long: "long long", unsigned long long: "unsigned long long", \
+        float: "float", \
+        double: "double", \
+        long double: "long double", \
+        void *: "void *", \
+        default: "unkown type")) 
 
 #define _all_integral_types \
 char , signed char , unsigned char, \

@@ -79,7 +79,7 @@
 typedef long double long_double;
 typedef struct { int _x; } \
 	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error;
-
+typedef struct { bool success; }  _matcher_hidden_anyof_type;
 typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 
 // implementing pointers here would probably make sense too
@@ -96,7 +96,7 @@ typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 	typedef struct { type start; type end; } _matcher_hidden_between_type_##type;
 
 #define _matcher_generate_typedef_for_between(types...) \
-	_foreach_ladder_entry(_matcher_generate_typdef_between,, types		)
+	_foreach_ladder_entry(_matcher_generate_typdef_between,, types)
 
 #define _matcher_generate_typedefs_for_types(sort, types) \
 	_foreach_ladder_entry(_matcher_generate_typdef, sort, types)
@@ -188,21 +188,23 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
-		/*lessthan*/\
+		\
 		_matcher_generate_comparison_impl( \
 			_matcher_generate_lessthan_comparison, \
 			_local_matching_object.arg1, arg2, \
 			_matcher_relational_types) \
-		/*greaterthan*/\
+		\
 		_matcher_generate_comparison_impl( \
 			_matcher_generate_greaterthan_comparison, \
 			_local_matching_object.arg1, arg2, \
 			_matcher_relational_types) \
-		/*unequal*/\
+		\
 		_matcher_generate_comparison_impl( \
 			_matcher_generate_unequal_comparison, \
 			_local_matching_object.arg1, arg2, \
 			_matcher_relational_types) \
+		_matcher_hidden_anyof_type: _matcher_generate_anyof_comparisons( \
+		arg1, _matcher_selecet_anyof_compare(arg2)), \
 		default: \
 		compare(_local_matching_object.arg1, \
 		coerce_type(typeof(_local_matching_object.arg1), arg2)) \
@@ -250,6 +252,39 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	_matcher_relational_types) \
 	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 	))
+
+#define anyof(at_least_one, ...) \
+	(_matcher_create_anyof(at_least_one __VA_OPT__(,) __VA_ARGS__))
+
+#define  _matcher_create_anyof(...) \
+	(0, __VA_ARGS__, (_matcher_hidden_anyof_type) {0})
+
+#define _matcher_insert_comma(a, n) , n
+#define _matcher_remove_first_2_args_defer(_1, _2, ...) __VA_ARGS__
+#define _matcher_remove_first_2_args(in) _matcher_remove_first_2_args_defer(in)
+
+#define _matcher_anyof_remove_first_last(...) \
+	_matcher_remove_first_2_args( \
+	_foreach_ladder_reverse(_matcher_insert_comma, \
+	__VA_ARGS__ ))
+
+#define _matcher_selecet_anyof_compare(in) \
+_matcher_anyof_remove_first_last(_remove_brackets(_remove_brackets(in))) 
+
+#define _matcher_generate_anyof_comparisons(arg1, ...) \
+	false __VA_OPT__(_foreach2_ladder_entry( \
+	|| compare, _local_matching_object.arg1, __VA_ARGS__) )
+
+// utility for removing brackets
+#define _remove_brackets1(...) \
+        _remove_brackets2(_remove_brackets1 __VA_ARGS__)
+#define _remove_brackets2(...) __VA_ARGS__  
+#define _remove_guard_remove_brackets1
+
+#define _remove_concat(a,b) _remove_concat1(a,b)
+#define _remove_concat1(a,...) a##__VA_ARGS__
+#define _remove_brackets(input) _remove_concat(_remove_guard,\
+		_remove_brackets1 input) 
 
 #define _create_comparisons(...) \
 	true _matchany_foreach(&& \
