@@ -106,6 +106,12 @@ _matcher_generate_typedefs_for_types(greaterthan, _matcher_relational_types)
 _matcher_generate_typedefs_for_types(unequal, _matcher_relational_types)
 _matcher_generate_typedef_for_between(_matcher_relational_types)
 
+// dummy types for relational comparisons
+typedef struct { int placeholder:1; } _matcher_hidden_lessthan_type;
+typedef struct { int placeholder:1; } _matcher_hidden_greaterthan_type;
+typedef struct { int placeholder:1; } _matcher_hidden_notequal_type;
+typedef struct { int placeholder:1; } _matcher_hidden_between_type;
+
 #define _match_struct_element_numbered(mod, prop) typeof(prop) mod;
 
 #define _matchany_generate_elements(...) \
@@ -188,21 +194,21 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 #define _comparison_or_defaulter(arg1, arg2) \
 	_Generic((arg2), \
 		_matcher_hidden_wildcard_type: true, \
-		\
-		_matcher_generate_comparison_impl( \
-			_matcher_generate_lessthan_comparison, \
-			_local_matching_object.arg1, arg2, \
-			_matcher_relational_types) \
-		\
-		_matcher_generate_comparison_impl( \
-			_matcher_generate_greaterthan_comparison, \
-			_local_matching_object.arg1, arg2, \
-			_matcher_relational_types) \
-		\
-		_matcher_generate_comparison_impl( \
-			_matcher_generate_unequal_comparison, \
-			_local_matching_object.arg1, arg2, \
-			_matcher_relational_types) \
+		_matcher_hidden_lessthan_type: _matcher_relation_guard( \
+			_matcher_relational_struct_2nd_entry(arg2), > , \
+			_local_matching_object.arg1), \
+		_matcher_hidden_greaterthan_type: _matcher_relation_guard( \
+			_matcher_relational_struct_2nd_entry(arg2), < , \
+			_local_matching_object.arg1), \
+		_matcher_hidden_notequal_type: _matcher_relation_guard( \
+			_matcher_relational_struct_2nd_entry(arg2), != , \
+			_local_matching_object.arg1), \
+		_matcher_hidden_between_type: _matcher_relation_guard( \
+			_matcher_relational_struct_2nd_entry(arg2), <=, \
+			_local_matching_object.arg1) && \
+			_matcher_relation_guard( \
+			_matcher_relational_struct_3rd_entry(arg2), >=, \
+			_local_matching_object.arg1), \
 		_matcher_hidden_anyof_type: _matcher_generate_anyof_comparisons( \
 		arg1, _matcher_selecet_anyof_compare(arg2)), \
 		default: \
@@ -228,6 +234,29 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 #define _matcher_generate_expr_impl(sort, num, types) \
 	_foreach_ladder_entry(sort, num, types)	
 
+#define _matcher_relation_guard(in1, op, in2) \
+	__builtin_choose_expr(!is_struct(in1) && !is_union(in1) && \
+	!is_struct(in2) && !is_union(in2), \
+	__builtin_choose_expr(!is_struct(in1) && !is_union(in1), in1 , 0) op \
+	__builtin_choose_expr(!is_struct(in2) && !is_union(in2), in2 , 0), 0)
+
+#define lessthan(num) (0, num, (_matcher_hidden_lessthan_type) { 0 })
+#define greaterthan(num) (0, num, (_matcher_hidden_greaterthan_type) { 0 })
+#define notequal(num) (0, num, (_matcher_hidden_notequal_type) { 0 })
+#define between(num1, num2) (0, num1, num2, (_matcher_hidden_between_type) { 0 })
+
+#define _matcher_third2(x, y, ...) _matcher_first(__VA_ARGS__)
+#define _matcher_third(...) _matcher_third2(__VA_ARGS__, 0, 0)
+#define _matcher_second2(x, ...) _matcher_first(__VA_ARGS__)
+#define _matcher_second(...) _matcher_second2(__VA_ARGS__, 0)
+#define _matcher_first(x, ...) x 
+
+#define _matcher_relational_struct_2nd_entry(in) \
+_matcher_second(_remove_brackets(in))
+#define _matcher_relational_struct_3rd_entry(in) \
+_matcher_third(_remove_brackets(in))
+
+/* // deprecated
 #define lessthan(num)  (_Generic((num), \
 	_matcher_generate_expr_impl(_matcher_generate_lessthan_expr, num, \
 	_matcher_relational_types) \
@@ -252,9 +281,9 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	_matcher_relational_types) \
 	_matcher_hidden_i_just_want_to_avoid_a_trailing_comma_error: "._."\
 	))
-
+*/
 #define anyof(at_least_one, ...) \
-	(_matcher_create_anyof(at_least_one __VA_OPT__(,) __VA_ARGS__))
+	_matcher_create_anyof(at_least_one __VA_OPT__(,) __VA_ARGS__)
 
 #define  _matcher_create_anyof(...) \
 	(0, __VA_ARGS__, (_matcher_hidden_anyof_type) {0})
@@ -269,7 +298,7 @@ bool _comparison_or_defaulter_func(T arg1, U arg2) {
 	__VA_ARGS__ ))
 
 #define _matcher_selecet_anyof_compare(in) \
-_matcher_anyof_remove_first_last(_remove_brackets(_remove_brackets(in))) 
+_matcher_anyof_remove_first_last(_remove_brackets(in)) 
 
 #define _matcher_generate_anyof_comparisons(arg1, ...) \
 	false __VA_OPT__(_foreach2_ladder_entry( \
