@@ -2,7 +2,7 @@
 compiler = "gcc"
 
 [[targets]]
-name = "witc"
+name = "test"
 src = "."
 include_dir = "."
 type = "dll"
