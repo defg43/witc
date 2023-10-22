@@ -3,8 +3,8 @@ compiler = "gcc"
 
 [[targets]]
 name = "witc"
-src = ""
-include_dir = "./Nomu_Engine/Engine/src/include"
+src = "."
+include_dir = "."
 type = "dll"
 cflags = "-Werror -Wall"
 libs = ""
