@@ -512,18 +512,18 @@ switch_expr(\
 	(is_value32(a), a),\
 	(is_value64(a), a),\
 	\
-	(is_struct(a), ({ __auto_type _a = (a); &_a; })),\
-	(is_union(a), ({ __auto_type _a = (a); &_a; })),\
+	(is_struct(a), &a),\
+	(is_union(a), &a),\
 	(is_array(a), a), \
 	(is_pointer(a), a),\
-	(default_expr, ({ __auto_type _a = (a); &_a; }))\
+	(default_expr, &a)\
 )
 
 #define min_size(a, b) ({(sizeof(a) > sizeof(b))? sizeof(b) : sizeof(a);})
 
-#define compare(a, b)\
-_select_compare(a)(_adjust_compare_arg(a), \
-	_adjust_compare_arg(b), min_size(a, b))
+#define compare(a, b) \
+({ __auto_type _a = (a); __auto_type _b = (b); _select_compare(_a)(_adjust_compare_arg(_a), \
+	_adjust_compare_arg(_b), min_size(_a, _b) ); })
 
 #endif // not __cplusplus
 #endif /* TYPES_H */
