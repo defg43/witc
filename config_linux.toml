@@ -1,0 +1,10 @@
+[build]
+compiler = "gcc"
+
+[[targets]]
+name = "witc"
+src = ""
+include_dir = "./Nomu_Engine/Engine/src/include"
+type = "dll"
+cflags = "-Werror -Wall"
+libs = ""
