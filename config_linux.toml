@@ -8,4 +8,11 @@ include_dir = "./include"
 type = "exe"
 cflags = "-Werror -Wall"
 libs = ""
-deps = []
+
+[[targets]]
+name = "noop"
+src = "./src"
+include_dir = "./include"
+type = "dll"
+cflags = "-Werror -Wall"
+libs = ""
