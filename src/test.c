@@ -4,7 +4,7 @@
 
 typedef struct foo { int a; } foo;
 
-int main() {
+void test() {
 	int a = 5;
 	int b = 12;
 	float c = 10.5;
