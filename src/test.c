@@ -4,7 +4,7 @@
 
 typedef struct foo { int a; } foo;
 
-void test() {
+int main() {
 	int a = 5;
 	int b = 12;
 	float c = 10.5;
@@ -15,4 +15,7 @@ void test() {
 		pattern(5, 12, 10.5) printf("exact match");
 		pattern(_, _, _) printf("default");
 	}	
+	printf("\n");
+
+	return 0;
 }
