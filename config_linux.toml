@@ -1,9 +1,0 @@
-[build]
-compiler = "gcc"
-
-[[targets]]
-name = "witc"
-include_dir = "./include"
-cflags = "-Werror -Wall"
-type = "hdr"
-libs = ""
