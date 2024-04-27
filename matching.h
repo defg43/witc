@@ -317,8 +317,8 @@ _matcher_anyof_remove_first_last(_remove_brackets(in))
 		_remove_brackets1 input) 
 
 #define _create_comparisons(...) \
-	true _matchany_foreach(&& \
-	_comparison_or_defaulter,,__VA_ARGS__)
+	true _matchany_foreach( \
+	&&_comparison_or_defaulter,,__VA_ARGS__)
 	
 #define when ) && (
 
