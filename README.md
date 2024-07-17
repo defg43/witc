@@ -56,8 +56,8 @@ int main() {
 		printf("element %d at index %ld\n", iter.element, iter.index);
 	}
 }
-						// hate how this needlessly decays to a pointer btw
-						// v
+                        // hate how this needlessly decays to a pointer btw
+                        // v
 void foo(size_t length, int array[static length]) {
 
 	// in case the array decays to a pointer, the size can be specified explictly
