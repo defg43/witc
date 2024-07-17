@@ -112,6 +112,41 @@ typedef struct { int placeholder:1; } _matcher_hidden_greaterthan_type;
 typedef struct { int placeholder:1; } _matcher_hidden_notequal_type;
 typedef struct { int placeholder:1; } _matcher_hidden_between_type;
 
+// define structs to hold comparisons
+typedef struct { u8 lhs; u8 rhs; } u8_comparison_t
+typedef struct { u16 lhs; u16 rhs; } u16_comparison_t
+typedef struct { u32 lhs; u32 rhs; } u32_comparison_t;
+typedef struct { u64 lhs; u64 rhs; } u64_comparison_t;
+
+typedef struct { i8 lhs; i8 rhs; } i8_comparison_t;
+typedef struct { i16 lhs; i16 rhs; } i16_comparison_t;
+typedef struct { i32 lhs; i32 rhs; } i32_comparison_t;
+typedef struct { i64 lhs; i64 rhs; } i64_comparison_t;
+
+typedef struct { float lhs; float rhs; } float_comparison_t;
+typedef struct { double lhs; double rhs; } double_comparsion_t;
+typedef struct { long double lhs; double rhs; } long_double_comparison_t;
+typedef struct { void *lhs; void *rhs; } pointer_comparison_t;
+
+// union to store all possible comparisons
+// avoids false positive compiler errors caused by evaluating dead _Generic branches
+typedef union {
+	u8_comparison_t u8_com;
+	u16_comparison_t u16_com;
+	u32_comparison_t u32_com;
+	u64_comparison_t u64_com;
+	
+	i8_comparison_t i8_com;
+	i16_comparison_t i16_com;
+	i32_comparison_t i32_com;
+	i64_comparison_t i64_com;
+
+	float_comparison_t float_com;
+	double_comparsion_t double_com;
+	long_double_comparison_t long_double_com;
+	pointer_comparison_t pointer_com;
+} comparison_union_container_t;
+
 #define _match_struct_element_numbered(mod, prop) typeof(prop) mod;
 
 #define _matchany_generate_elements(...) \
