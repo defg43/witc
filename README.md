@@ -17,19 +17,19 @@ int b = 22;
 int c = 101;
 int main() {
 	match(a, b, c) {
-			pattern(1, 2, 3) { // precise match
-				printf("first case\n");
-			}
-			pattern(anyof(1, 2, 3), 22, 102) { // first number can multiple values
-				printf("second case\n");
-			}
-			pattern(lessthan(12), notequal(5), between('a', 55)) { // relational matching
-				printf("third case\n");
-			}
-			pattern(_, _, 101 when timeOfDay() == 1245) { // match guard
-				printf("last case\n");
-			}
-		}	
+		pattern(1, 2, 3) { // precise match
+			printf("first case\n");
+		}
+		pattern(anyof(1, 2, 3), 22, 102) { // first number can multiple values
+			printf("second case\n");
+		}
+		pattern(lessthan(12), notequal(5), between('a', 55)) { // relational matching
+			printf("third case\n");
+		}
+		pattern(_, _, 101 when timeOfDay() == 1245) { // match guard
+			printf("last case\n");
+		}
+	}	
 }
 ```
 foreach:
