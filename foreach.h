@@ -2,6 +2,8 @@
 // Copyright (C) 2023 defg43
 // https://github.com/defg43/
 
+
+
 #ifndef FOREACH_H 
 #define FOREACH_H
 
