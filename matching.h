@@ -82,6 +82,56 @@ typedef struct { int _x; } \
 typedef struct { bool success; }  _matcher_hidden_anyof_type;
 typedef struct { bool iterator; bool matched; } _matcher_hidden_wildcard_type;
 
+// new approach: each type of comparison is represented as a type
+
+// relational
+typedef struct {int placeholder; } lessthan_comparison_t;
+typedef struct {int placeholder; } greaterthan_comparison_t;
+typedef struct {int placeholder; } unequal_comparison_t;
+typedef struct {int placeholder; } between_comparison_t;
+
+// 
+typedef struct {int placeholder; } wildcard_comparsion_t;
+typedef struct {int placeholder; } anyof_comparison_t;
+typedef struct {int placeholder; } noneof_comparison_t;
+
+#define MATCHER_GET_ARGS(args...) args
+#define MATCHER_GET_FIRST_ARG(first, args...) first
+#define MATCHER_GET_SECOND_ARG(first, second, args...) second
+#define MATCHER_GET_ARGPACK(placeholder, argpack, identtype, ...) argpack
+
+#define _match_generic_compare(comparison, root_arg)							\
+	_Generic((comparison),														\
+		wildcard_comparsion_t: true,											\
+		anyof_comparison_t: 													\
+			_matcher_generate_anyof_comparisons(								\
+				rootarg, MATCHER_GET_ARGS 										\
+				MATCHER_GET_ARGPACK(comparison, (0, 0), 0)), 					\
+		lessthan_comparison_t: MATCHER_GET_ARGS 								\
+			MATCHER_GET_ARGPACK(comparison, (0, 0), 0) < root_arg,				\
+		greaterthan_comparison_t: MATCHER_GET_ARGS 								\
+			MATCHER_GET_ARGPACK(comparison, (0, 0), 0) > root_arg,				\
+		unequal_comparison_t: MATCHER_GET_ARGS									\
+			MATCHER_GET_ARGPACK(comparison, (0, 0), 0) != root_arg, 			\
+		between_comparison_t: 													\
+			({																	\
+				auto first_arg = MATCHER_GET_FIRST_ARG							\
+				MATCHER_GET_ARGPACK(comparsion, (0, 0), 0);						\
+				auto second_arg = MATCHER_GET_SECOND_ARG 						\
+				MATCHER_GET_ARGPACK(comparison, (0, 0), 0);						\
+				auto root = root_arg;											\
+				bool result = false;											\
+				first_arg < root && root <= second_arg;							\
+			}),																	\
+		default:																\
+			({																	\
+				auto comp = comparison;											\
+				auto root = root_arg;											\
+				sizeof(comp) == sizeof(root) 									\
+				&& _matcher_memcmp(&comp, &root, min_size(comp, root)) == 0;	\
+			}),																	\
+	)
+	
 // implementing pointers here would probably make sense too
 #define _matcher_relational_types \
 	char, \
@@ -112,9 +162,19 @@ typedef struct { int placeholder:1; } _matcher_hidden_greaterthan_type;
 typedef struct { int placeholder:1; } _matcher_hidden_notequal_type;
 typedef struct { int placeholder:1; } _matcher_hidden_between_type;
 
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
 // define structs to hold comparisons
-typedef struct { u8 lhs; u8 rhs; } u8_comparison_t
-typedef struct { u16 lhs; u16 rhs; } u16_comparison_t
+typedef struct { u8 lhs; u8 rhs; } u8_comparison_t;
+typedef struct { u16 lhs; u16 rhs; } u16_comparison_t;
 typedef struct { u32 lhs; u32 rhs; } u32_comparison_t;
 typedef struct { u64 lhs; u64 rhs; } u64_comparison_t;
 
@@ -339,6 +399,24 @@ _matcher_anyof_remove_first_last(_remove_brackets(in))
 #define _matcher_generate_anyof_comparisons(arg1, ...) \
 	false __VA_OPT__(_foreach2_ladder_entry( \
 	|| compare, _local_matching_object.arg1, __VA_ARGS__) )
+
+static inline int _matcher_memcmp(void *a, void *b, size_t size) {
+  register const unsigned char *s1 = (const unsigned char*)a;
+  register const unsigned char *s2 = (const unsigned char*)b;
+  	while (size --> 0) {
+      	if (*s1++ != *s2++)
+	  	return s1[-1] < s2[-1] ? -1 : 1;
+	}
+  	return 0;
+}
+
+#define _matcher_simple_compare(a, b) (a == b)
+#define _matcher_simple_unequal(a, b) (a != b)
+
+#define _matcher_anyof_compare(arg1, args...)    			\
+	false __VA_OPT__(_foreach2_ladder_entry(  				\
+	|| _matcher_simple_compare, arg1, args)					\
+	)
 
 // utility for removing brackets
 #define _remove_brackets1(...) \

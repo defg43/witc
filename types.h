@@ -362,56 +362,56 @@ enum all_integrals {
 	            return a == b;
 	    } 
 #else
-bool _compare_u8 (uint8_t a, uint8_t b, size_t size) {
+static inline bool _compare_u8 (uint8_t a, uint8_t b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_u16(uint16_t a, uint16_t b, size_t size) {
+static inline bool _compare_u16(uint16_t a, uint16_t b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_u32(uint32_t a, uint32_t b, size_t size) {
-	(void) size;
-	return a == b;
-	}
-
-bool _compare_u64(uint64_t a, uint64_t b, size_t size) {
+static inline bool _compare_u32(uint32_t a, uint32_t b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_float(float a, float b, size_t size) {
+static inline bool _compare_u64(uint64_t a, uint64_t b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_double(double a, double b, size_t size) {
+static inline bool _compare_float(float a, float b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_long_double(long double a,long double b, size_t size) {
+static inline bool _compare_double(double a, double b, size_t size) {
 	(void) size;
 	return a == b;
 }
 
-bool _compare_const_char_string(const char a[static 1], const char b[static 1], size_t size) {
+static inline bool _compare_long_double(long double a,long double b, size_t size) {
+	(void) size;
+	return a == b;
+}
+
+static inline bool _compare_const_char_string(const char a[static 1], const char b[static 1], size_t size) {
 	(void) size;
 	return strcmp((char *)a, (char *)b) == 0;
 }
 
-bool _compare_char_string(char a[static 1], char b[static 1], size_t size) {
+static inline bool _compare_char_string(char a[static 1], char b[static 1], size_t size) {
 	(void) size;
 	return strcmp(a, b) == 0;
 }
 
-bool _compare_byte_array(void *a, void *b, size_t size) {
+static inline bool _compare_byte_array(void *a, void *b, size_t size) {
 	return memcmp(a, b, size) == 0;
 }
 
-bool _compare_raw_pointer(void *a, void *b, size_t size) {
+static inline bool _compare_raw_pointer(void *a, void *b, size_t size) {
 	(void) size;
 	return a == b;
 }
@@ -516,7 +516,7 @@ switch_expr(\
 	(is_union(a), &a),\
 	(is_array(a), a), \
 	(is_pointer(a), a),\
-	(default_expr, &a)\
+	(default_expr, &a) \
 )
 
 #define min_size(a, b) ({(sizeof(a) > sizeof(b))? sizeof(b) : sizeof(a);})
