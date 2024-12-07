@@ -1,4 +1,4 @@
-# witc
++# witc
 wait is this C?
 
 This is a funny header only library that provides some cursed macros.
@@ -10,7 +10,7 @@ matching:
 #include "matching.h"
 #include <stdio.h>
 
-extern int timeOfDay(void);
+int timeOfDay(void);
 
 int a = 1;
 int b = 22;
@@ -20,7 +20,7 @@ int main() {
 		pattern(1, 2, 3) { // precise match
 			printf("first case\n");
 		}
-		pattern(anyof(1, 2, 3), 22, 102) { // first number can multiple values
+		pattern(anyof(1, 2, 3), 22, 102) { // first number can have multiple values
 			printf("second case\n");
 		}
 		pattern(lessthan(12), notequal(5), between('a', 55)) { // relational matching
@@ -38,6 +38,7 @@ foreach:
 #include <stdio.h>
 
 int array[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+void foo(size_t length, int array[static length]);
 
 int main() {
 	// we use javascript inspired of and in semantics
@@ -56,8 +57,7 @@ int main() {
 		printf("element %d at index %ld\n", iter.element, iter.index);
 	}
 }
-                        // hate how this needlessly decays to a pointer btw
-                        // v
+
 void foo(size_t length, int array[static length]) {
 
 	// in case the array decays to a pointer, the size can be specified explictly
@@ -74,7 +74,7 @@ void foo(size_t length, int array[static length]) {
 ```
 loops and misc:
 ```c
-#include "loop"
+#include "loop.h"
 #include <stdio.h>
 
 int main() {
