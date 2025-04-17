@@ -315,7 +315,15 @@ enum all_integrals {
 	default: 0 \
 )
 
-#define coerce_type(type, arg) ({typeof(arg) _x = arg; *((type *)&_x);})
+#define coerce_type(type, _expr) ({                                         \
+    auto expr = (_expr);                                                    \
+    union {                                                                 \
+        typeof(expr) i_have_this;                                           \
+        type but_i_want_this;                                               \
+    } converter = { .i_have_this = expr };                                  \
+    converter.but_i_want_this;                                              \
+})
+
 
 // probably deprecated
 #define _coerce_into_integral_type(type_num, var) \
