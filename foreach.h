@@ -18,17 +18,29 @@
 
 #define arrayAsPtr(arr) ({												\
 	struct {															\
-		typeof(decay(arr)) element;										\
+		typeof(decay(arr)) at;											\
 		size_t count;													\
 	} dumy;																\
-	__builtin_choose_expr(is_struct(arr), arr, dumy.element) = arr;		\
-	__builtin_choose_expr(is_struct(arr), arr, dumy).element;			\
+	__builtin_choose_expr(is_struct(arr), arr, dumy.at) = arr;			\
+	__builtin_choose_expr(is_struct(arr), arr, dumy).at;				\
 })
 
+#if defined __has_include && __has_include ("str.h")
+#define lengthof(arr) ({												\
+	struct { size_t count; } dumy = 									\
+		{ .count = sizeof arr / sizeof arrayAsPtr(arr)[0] };			\
+	__builtin_choose_expr(												\
+		__builtin_types_compatible_p(typeof(arr), string), 				\
+			stringlen(arr),												\
+			__builtin_choose_expr(is_struct(arr), arr, dumy).count);	\
+})
+#else
 #define lengthof(arr) ({																		\
 	struct { size_t count; } dumy = { .count = sizeof arr / sizeof arrayAsPtr(arr)[0] };		\
 	__builtin_choose_expr(is_struct(arr), arr, dumy).count;										\
 })
+#endif
+
 										
 
 #ifdef __cplusplus

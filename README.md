@@ -1,4 +1,4 @@
-+# witc
+# witc
 wait is this C?
 
 This is a funny header only library that provides some cursed macros.
