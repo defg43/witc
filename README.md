@@ -43,10 +43,10 @@ void foo(size_t length, int array[static length]);
 int main() {
 	// we use javascript inspired of and in semantics
 	foreach(int element in array) {
-		printf("the element is %d\n", element);
+		printf("the element of %d\n", element);
 	}
 
-	foreach(size_t index of array) {
+	foreach(size_t index in array) {
 		printf("the index is %ld\n", index);
 	}
 	
@@ -61,12 +61,12 @@ int main() {
 void foo(size_t length, int array[static length]) {
 
 	// in case the array decays to a pointer, the size can be specified explictly
-	foreach(int element in length sized array) {
+	foreach(int element of length sized array) {
 		printf("the element is %d\n", element);
 	}
 
 	// works with of too
-	foreach(size_t index of length sized array) {
+	foreach(size_t index in length sized array) {
 		printf("the index is %ld\n", index);
 	}
 		
